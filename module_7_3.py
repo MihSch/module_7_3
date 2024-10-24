@@ -1,32 +1,34 @@
 class WordsFinder:
-
-    def __init__(self, file_names):
+    def __init__(self, *file_names):
         self.file_names = file_names
 
     def get_all_words(self):
         all_words = {}
         punc = [',', '.', '=', '!', '?', ';', ':', '-', '(', ')']
-        with open(self.file_names, encoding='utf-8') as file:
-            for line in file:
-                line = line.lower()
-                for i in line:
-                    if i in punc:
-                        line = line.replace(i, '')
-            all_words.update({self.file_names: line.split()})
+        for file_n in self.file_names:
+            with open(file_n, 'r', encoding='utf-8') as file:
+                words = []
+                for line in file:
+                    line = line.lower()
+                    for pun in punc:
+                        line = line.replace(pun, '')
+                    line = line.replace(' - ', ' ')
+                    words.extend(line.split())
+                all_words[file_n] = words
         return all_words
 
     def find(self, word):
         dict_ = {}
-        word_key = self.get_all_words()[self.file_names]
-        for i in range(len(word_key)):
-            if word.lower() == word_key[i]:
-                dict_.update({self.file_names: i + 1})
-                return dict_
+        for key, value in self.get_all_words().items():
+            if word.lower() in value:
+                dict_[key] = value.index(word.lower()) + 1
+        return dict_
 
     def count(self, word):
         word_count = {}
-        word_key = self.get_all_words()[self.file_names]
-        word_count.update({self.file_names: word_key.count(word.lower())})
+        for value, key in self.get_all_words().items():
+            count = key.count(word.lower())
+            word_count[value] = count
         return word_count
 
 
